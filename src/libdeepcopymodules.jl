@@ -5,8 +5,6 @@ module GenAPI
 const libdeepcopymodules = joinpath(dirname(@__DIR__), "deps/usr/libdeepcopymodules.dylib")
 
 const jl_module_t = Module
-const jl_value_t = Cvoid
-const jl_sym_t = Symbol
 
 include("gen/libdeepcopymodules_api.jl")
 
