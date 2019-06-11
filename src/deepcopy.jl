@@ -1,7 +1,11 @@
 function deepcopy_module(m::Module)
-    m2 = Module(nameof(m), true)
-    import_names_into(m2, m)
+    m2 = Module(nameof(m), false)
+
+    @eval m2 include(fname::AbstractString) = Main.Base.include($m2, fname)
+    @eval m2 eval(x) = Core.eval($m2, x)
+
     setparent!(m2, parentmodule(m))
+    import_names_into(m2, m)
     return m2
 end
 
@@ -17,7 +21,7 @@ function import_names_into(destmodule, srcmodule)
         Core.eval(destmodule, Expr(:using, _full_using_name(m)))
     end
     imports = names(srcmodule, imported=true)
-    # don't copy itself into itself; don't copy `include`, define it below instead
+    # don't copy itself into itself; don't copy `include`, defined manually instead
     excluded_names = (nameof(srcmodule), Symbol("#include"), :include)
     imports = setdiff(imports, excluded_names)
     for n in imports
@@ -41,10 +45,10 @@ function import_names_into(destmodule, srcmodule)
     for n in reverse(ns)
         srcval = Core.eval(srcmodule, n)
         #@show destmodule, srcmodule, n, typeof(srcval)
-        @eval destmodule $n = $srcval
+        # If this name has already been defined by previous steps, skip it
+        try Core.eval(destmodule, n) ; continue; catch end
         deepcopy_value(destmodule, srcmodule, n, srcval)
     end
-    @eval destmodule include(fname::AbstractString) = Main.Base.include(@__MODULE__, fname)
 end
 
 

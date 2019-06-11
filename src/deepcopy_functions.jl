@@ -35,9 +35,9 @@ compressed_ast(m::Method, ci::Core.CodeInfo) =
 function deepcopy_function(destmodule::Module, f::Function)
     name = nameof(f)
     f2 = try
-            @eval destmodule function $name end
+            Core.eval(destmodule, name)
         catch
-            @eval destmodule $name
+            @eval destmodule function $name end
         end
     src_ms = methods(f).ms
     for m in src_ms
@@ -45,8 +45,11 @@ function deepcopy_function(destmodule::Module, f::Function)
     end
 end
 
+_func_sig_params(t::Type{T}) where {T<:Tuple} = T.parameters[2:end]
+_func_sig_params(t::UnionAll) = _func_sig_params(t.body)
 function deepcopy_method(destmodule, m, func::Function)
-    svparams = Core.svec(typeof(func), fieldtypes(m.sig)[2:end]...)
+    # TODO: is it okay to use m.sig.parameters
+    svparams = Core.svec(typeof(func), _func_sig_params(m.sig)...)
     argdata = Core.svec(svparams, m.sparam_syms)
 
     ci = Base.uncompressed_ast(m)
