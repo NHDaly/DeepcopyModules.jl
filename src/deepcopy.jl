@@ -31,3 +31,15 @@ deepcopy_value(destmodule, srcmodule, name, value) = Core.eval(destmodule, :($na
 function deepcopy_value(destmodule, srcmodule, name, value::Function)
     deepcopy_function(destmodule, value)
 end
+
+# Manually implement "missing" julia Base function to allow setting the parent of a module.
+function setparent!(m::Module, p::Module)
+    unsafe_store!(Ptr{_Module2}(pointer_from_objref(m)),
+                   _Module2(nameof(m), p), 1)
+    m
+end
+# NOTE: This struct must be kept up-to-date with Julia's `_jl_module_t`!
+struct _Module2
+    name::Symbol
+    parent::Module
+end
