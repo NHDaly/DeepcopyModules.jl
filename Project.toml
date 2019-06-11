@@ -1,0 +1,13 @@
+name = "DeepcopyModules"
+uuid = "6f12c252-8bf0-11e9-1bb6-ff8912d7735c"
+authors = ["Nathan Daly <nhdaly@gmail.com>"]
+version = "0.1.0"
+
+[deps]
+AbstractTrees = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
