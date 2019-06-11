@@ -34,7 +34,11 @@ compressed_ast(m::Method, ci::Core.CodeInfo) =
 
 function deepcopy_function(destmodule::Module, f::Function)
     name = nameof(f)
-    f2 = @eval destmodule function $name end
+    f2 = try
+            @eval destmodule function $name end
+        catch
+            @eval destmodule $name
+        end
     src_ms = methods(f).ms
     for m in src_ms
         deepcopy_method(destmodule, m, f2)
