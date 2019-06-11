@@ -1,7 +1,7 @@
 name = "DeepcopyModules"
 uuid = "6f12c252-8bf0-11e9-1bb6-ff8912d7735c"
 authors = ["Nathan Daly <nhdaly@gmail.com>"]
-version = "0.1.1"
+version = "0.1.2"
 
 [deps]
 AbstractTrees = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"
