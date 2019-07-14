@@ -1,10 +1,16 @@
 # DeepcopyModules
 
+[![Build Status](https://travis-ci.org/NHDaly/DeepcopyModules.jl.svg?branch=master)](https://travis-ci.org/NHDaly/DeepcopyModules.jl)
+
 > _"You can't really copy what I do because I don't do anything." – David Bailey_
 
 
 A library that provides a function to deepcopy julia `Module`s, including
 deep-copying all their contained functions and variables.
+
+(Note that this is essentially a replacement for `Base.deepcopy(m::Module)`,
+but of course we don't add a method to that function because, arrrr, this
+package is not a type pirate! ☠️)
 
 ## Motivation
 
