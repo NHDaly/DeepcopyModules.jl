@@ -101,6 +101,22 @@ end
     end
 end
 
+@testset "Modules with type definitions" begin
+    # TODO: Currently struct definitions are not deep-copied, so this
+    # test fails.
+    m1 = @eval module M1
+        struct S1 x end
+    end
+    m2 = deepcopy_module(M1)
+    @test_broken @eval m2 S1() = S1(1)
+
+    # Make sure that the new method in m2 isn't part of m1
+    @test_throws MethodError m1.S1()
+end
+
+
+# ----- Implementation functions: --------
+
 @testset "replace modules" begin
     m2 = @eval module M2 end
     m1 = @eval module M1
