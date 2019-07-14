@@ -45,12 +45,12 @@ function deepcopy_function(destmodule::Module, f::Function)
     end
 end
 
-_func_sig_params(t::Type{T}) where {T<:Tuple} = T.parameters[2:end]
-_func_sig_params(t::UnionAll) = _func_sig_params(t.body)
+_func_sig_params(t) = t isa UnionAll ? _func_sig_params(t.body) : t.parameters[2:end]
+_func_sig_typeparams(t) = t isa UnionAll ? (t.var, _func_sig_typeparams(t.body)...) : ()
 function deepcopy_method(destmodule, m, func::Function)
     # TODO: is it okay to use m.sig.parameters
-    svparams = Core.svec(typeof(func), _func_sig_params(m.sig)...)
-    argdata = Core.svec(svparams, m.sparam_syms)
+    argdata = Core.svec(Core.svec(typeof(func), _func_sig_params(m.sig)...),
+                        Core.svec(_func_sig_typeparams(m.sig)...))
 
     ci = Base.uncompressed_ast(m)
     ci = code_replace_module!(ci, m.module => destmodule)

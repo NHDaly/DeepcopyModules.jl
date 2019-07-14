@@ -68,6 +68,39 @@ end
     @test M1.foo() == 4
 end
 
+@testset "functions with typevar" begin
+    @testset "simple UnionAll" begin
+        m1 = @eval module M1
+            foo(x::T) where {T} = T
+        end
+        @assert m1.foo(5) == Int
+
+        m2 = @eval module M2 end
+        DeepcopyModules.deepcopy_function(M2, M1.foo)
+
+        @test M2.foo != M1.foo
+        @test M2.foo(5) == Int
+    end
+
+    @testset "nested UnionAll" begin
+        m1 = @eval module M1
+            _dims(a::Array{T, N}) where T where N = N
+            _eltype(a::Array{T, N}) where T where N = T
+        end
+        @assert m1._dims([1,2,3]) == 1
+        @assert m1._eltype([1,2,3]) == Int
+
+        m2 = @eval module M2 end
+        DeepcopyModules.deepcopy_function(m2, m1._dims)
+        DeepcopyModules.deepcopy_function(m2, m1._eltype)
+
+        @test m2._dims != m1._dims
+        @test m2._eltype != m1._eltype
+        @test m2._dims([1,2,3]) == 1
+        @test m2._eltype([1,2,3]) == Int
+    end
+end
+
 @testset "replace modules" begin
     m2 = @eval module M2 end
     m1 = @eval module M1
@@ -97,3 +130,4 @@ end
         @test parentmodule(m2) == m
     end
 end
+
