@@ -1,5 +1,6 @@
 using DeepcopyModules
 
+using InteractiveUtils
 using Test
 
 module Outer end
