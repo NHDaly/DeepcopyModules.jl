@@ -14,13 +14,34 @@ https://discourse.julialang.org/t/deepcopy-module-and-mocking-for-tests/24214
 
 # Usage
 
+    deepcopy_module(m::Module)
+
+Returns a newly constructed Module (`m2`) that is a complete deep-copy of
+module `m`, containing deep-copies of all the `name`s in `m`.
+
+All functions contained in `m` are deep-copied, so that the returned module
+`m2` contains new generic function objects that have all the same methods as
+the functions from `m`, and all code in the new methods will have been modified
+so that any references to names in `m` will now be references to names in `m2`.
+
 ```julia
-module m1 ... end
-m2 = DeepcopyModules.deepcopy_module(m1)
-@eval m2 begin ... end  # Do anything you want to modify m2, and m1 is unchanged
+julia> module M;  x = 1;  f() = (global x += 1);  end
+Main.M
+
+julia> M2 = deepcopy_module(M)
+Main.M
+
+julia> M2.f()  # This only modifies the copy of `x` in M2.
+2
+
+julia> M2.x, M.x
+(2, 1)
+
+julia> nameof(M2)  # Inside M2, it still believes it's module M
+:M
 ```
 
-## Examples
+## Example Usage: Mocking.jl
 
 The file [examples/mocking.jl](examples/mocking.jl) contains an example of
 using this package to implement a mock-testing framework:
